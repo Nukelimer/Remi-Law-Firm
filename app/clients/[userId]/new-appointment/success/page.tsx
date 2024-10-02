@@ -24,7 +24,14 @@ function SuccessPage() {
 
         <section className="flex flex-col items-center">
 
-          
+        <Image
+            priority
+            src="/assets/gifs/"
+            alt="logo"
+            width={10000}
+            height={10000}
+            className="mb-12 h-60 mx-auto w-fit"
+          />
         </section>
 </div>
 
