@@ -3,13 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import RLLP_Forms from "./RLLP_Forms";
 import RLLP_SubmitBtn from "./RLLP_SubmitBtn";
 import { useState } from "react";
 import { RLLP_UserValidation } from "@/lib/RLLP_validation";
 import { useRouter } from "next/navigation";
+import { createUser } from "@/lib/actions/client.action";
 export enum FormFieldType {
   INPUT = "input",
   CHECKBOX = "checkbox",
@@ -20,9 +20,9 @@ export enum FormFieldType {
   DATE_PICKER = "datePicker",
 }
 
- function ClientForm() {
+function ClientForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const router =  useRouter() 
+  const router = useRouter();
   const form = useForm<z.infer<typeof RLLP_UserValidation>>({
     resolver: zodResolver(RLLP_UserValidation),
     defaultValues: {
@@ -32,18 +32,25 @@ export enum FormFieldType {
     },
   });
 
-   function onSubmit({ name, email, phone }: z.infer<typeof RLLP_UserValidation>) {
+  async function onSubmit({
+    name,
+    email,
+    phone,
+  }: z.infer<typeof RLLP_UserValidation>) {
     setIsLoading(true);
+    const userData = { name, email, phone };
+    console.log({ userData });
 
     try {
-      // const userData = { name, email, phone };
-      // const user = await createUser(userData)
+      const user = await createUser(userData);
 
-      // if (user) {
-      //   router.push(`/patients/${user.$id}/register`)
-      // }
+      if (user) {
+        router.push(`/clients/${user.$id}/register`);
+      }
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -58,7 +65,7 @@ export enum FormFieldType {
         </section>
         <RLLP_Forms
           control={form.control}
-          name="Name"
+          name="name"
           label="Name"
           placeholder="E.g Adekunle Rabi Chinasa"
           iconSrc="/assets/icons/user.svg"
@@ -68,7 +75,7 @@ export enum FormFieldType {
 
         <RLLP_Forms
           control={form.control}
-          name="Email"
+          name="email"
           label="Email"
           placeholder="E.g Remi@lifework.live"
           iconSrc="/assets/icons/email.svg"
@@ -78,7 +85,7 @@ export enum FormFieldType {
 
         <RLLP_Forms
           control={form.control}
-          name="Phone"
+          name="phone"
           label="Phone"
           placeholder="E.g +(234)811-520-788"
           iconSrc="/assets/icons/email.svg"

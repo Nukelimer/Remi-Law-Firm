@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { useState, useEffect } from "react";
 import { LockKeyhole } from "lucide-react";
 import Image from "next/image";
@@ -17,29 +17,28 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="text-white flex h-screen max-h-screen">
-      <section className="remove-scrollbar container my-auto">
-        <div className="sub-container max-w-[495px]">
+    <div className="text-white flex h-screen max-h-screen flex-row ">
+      <section className="remove-scrollbar container my-auto h-screen">
+        <div className="sub-container max-w-[495px] !pt-0">
           <Image
             priority
             src="/assets/icons/logo-full_.png"
             alt="logo"
             width={10000}
             height={10000}
-            className="mb-12 h-52 mx-auto w-fit"
+            className="mb-12 h-40 mx-auto w-fit"
           />
           <ClientForm />
 
-          <div className="text-14-regular mt-20 flex justify-between ">
+          <div className="text-14-regular mt-6 flex justify-between ">
             <p className="justify-items-end text-dark-600 xl:text-left">
               {" "}
-              &copy; 2024 Care-Plus
+              &copy; 2024 RLF
             </p>
 
             <Link
               href={"/?admin=true"}
-              className="text-green-500 flex gap-1 items-center"
-            >
+              className="text-green-500 flex gap-1 items-center">
               <LockKeyhole /> Admin
             </Link>
           </div>
@@ -47,7 +46,7 @@ export default function Home() {
       </section>
 
       {/* Container for the images with a smooth fade transition */}
-      <div className="relative w-1/2 h-full md:flex hidden">
+      <div className="relative w-1/2 h-full  md:flex hidden">
         <Image
           priority
           src={"/assets/images/onboarding-img_.png"}

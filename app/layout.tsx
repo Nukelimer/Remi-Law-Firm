@@ -11,8 +11,8 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
-  title: "Care-Plus",
-  description: "Medical Booking App",
+  title: "Remi Law Firm",
+  description: "A Law Firm Booking App",
 };
 
 export default function RootLayout({
@@ -24,7 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={cn(
-          `min-h-screen bg-dark-300 antialiased font-sora`,
+          `min-h-screen text-white bg-dark-300  antialiased font-sora`,
           sora.variable
         )}>
         <ThemeProvider
