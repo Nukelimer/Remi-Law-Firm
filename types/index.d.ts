@@ -18,8 +18,6 @@ declare interface User extends CreateUserParams {
 }
 
 declare interface RegisterUserParams extends CreateUserParams {
-
-
   userId: string;
   d_o_b: Date;
   gender: Gender;
@@ -39,9 +37,9 @@ declare interface RegisterUserParams extends CreateUserParams {
 
 declare type CreateAppointmentParams = {
   userId: string;
-  CLIENTCOLLECTIONID: string;
+  CLIENT_COLLECTION_ID: string;
   primary_counsel_or_lawyer: string;
-  reason?: string;
+  reason: string;
   schedule: Date;
   status: Status;
   note: string | undefined;

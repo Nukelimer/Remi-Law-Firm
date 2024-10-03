@@ -63,7 +63,7 @@ function AppointmentForms({
   async function onSubmit(values: z.infer<typeof AppointmentFormValidation>) {
     setIsLoading(true);
     // const userData = { name, email, phone };
-    console.log({ newApp:values});
+    console.log({ newApp: values });
 
     let status;
     switch (type) {
@@ -86,17 +86,19 @@ function AppointmentForms({
         // router.push(`/clients/${user.$id}/register`);
         const appointmentData = {
           userId,
-          CLIENTCOLLECTIONID: clientId,
+          CLIENT_COLLECTION_ID: clientId,
           primary_counsel_or_lawyer: values.primary_counsel_or_lawyer,
           schedule: new Date(values.schedule),
-          reason: values.reason,
+          reason: values.reason!,
           note: values.note,
           status: status as Status,
         };
         const appointment = await createAppointment(appointmentData);
         if (appointment) {
-          form.reset()
-          router.push(`/clients/${userId}/new-appointment/success?appointment=${appointment.$id}`)
+          form.reset();
+          router.push(
+            `/clients/${userId}/new-appointment/success?appointment=${appointment.$id}`
+          );
         }
       }
     } catch (error) {

@@ -26,11 +26,11 @@ function SuccessPage() {
 
         <Image
             priority
-            src="/assets/gifs/"
-            alt="logo"
-            width={10000}
-            height={10000}
-            className="mb-12 h-60 mx-auto w-fit"
+            src="/assets/gifs/success.gif"
+            alt="success"
+            width={100}
+            height={100}
+            // className="mb-12 h-60 mx-auto w-fit"
           />
         </section>
 </div>

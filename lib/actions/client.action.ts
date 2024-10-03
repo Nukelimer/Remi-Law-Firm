@@ -24,15 +24,18 @@ export const createUser = async (user: CreateUserParams) => {
       user.name
     );
 
-    console.log({ newuser });
+    // console.log({ newuser });
     return parseStringify(newuser);
   } catch (error: any) {
     if (error && error?.code === 409) {
       const existingUser = await users.list([
         Query.equal("email", [user.email]),
       ]);
-      return existingUser?.users[0];
+      return existingUser.users[0];
     }
+
+    console.error("An error occurred while creating a new user:", error);
+    
   }
 };
 
@@ -60,11 +63,11 @@ export const registerUser = async ({
       file = await storage.createFile(BUCKET_ID!, ID.unique(), inputFile);
     }
 
-    console.log({
-      identificationDocumentId: file?.$id ? file.$id : null,
-      identification_document_link: `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file?.$id}/view?project=${PROJECT_ID}`,
-      ...Client,
-    });
+    // console.log({
+    //   identificationDocumentId: file?.$id ? file.$id : null,
+    //   identification_document_link: `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file?.$id}/view?project=${PROJECT_ID}`,
+    //   ...Client,
+    // });
 
     const newClient = await databases.createDocument(
       DATABASE_ID!,
@@ -83,22 +86,15 @@ export const registerUser = async ({
   }
 };
 
-
-
 export const getClient = async (userId: string) => {
   try {
-    const client = await databases.listDocuments(    DATABASE_ID!,
+    const client = await databases.listDocuments(
+      DATABASE_ID!,
       CLIENT_COLLECTION_ID!,
-      [
-      
-        Query.equal('userId', userId)
-    ]
-    
+      [Query.equal("userId", userId)]
     );
     return parseStringify(client.documents[0]);
   } catch (error) {
     console.log(error);
   }
 };
-
-

@@ -1,4 +1,4 @@
-'use server'
+"use server";
 
 import { ID } from "node-appwrite";
 import {
@@ -11,15 +11,16 @@ import { parseStringify } from "../utils";
 export const createAppointment = async (
   appointment: CreateAppointmentParams
 ) => {
+  console.log({ appointment });
   try {
     const newAppointment = await databases.createDocument(
       DATABASE_ID!,
       APPOINTMENT_COLLECTION_ID!,
       ID.unique(),
-      appointment
+      JSON.stringify(appointment)
     );
     return parseStringify(newAppointment);
   } catch (error) {
-    console.log(error);
+    console.log("An error occurred while creating a new appointment:", error);
   }
 };
