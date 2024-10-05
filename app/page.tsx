@@ -4,9 +4,12 @@ import { LockKeyhole } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import ClientForm from "@/components/forms/ClientForms";
+import PassKeyModal from "@/components/PassKeyModal";
 
-export default function Home() {
+export default function Home({ searchParams }: SearchParamProps) {
   const [showFirstImage, setShowFirstImage] = useState(true);
+
+  const isAdmin = searchParams.admin === "true";
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -18,16 +21,21 @@ export default function Home() {
 
   return (
     <div className="text-white flex h-screen max-h-screen flex-row ">
+      {isAdmin && <PassKeyModal />}
       <section className="remove-scrollbar container my-auto h-screen">
         <div className="sub-container max-w-[495px] !pt-0">
+          <Link href={'/'}>
+          
           <Image
             priority
             src="/assets/icons/logo-full_.png"
             alt="logo"
             width={10000}
             height={10000}
-            className="mb-12 h-40 mx-auto w-fit"
+            className="mb-12 h-80 mx-auto w-fit"
           />
+          
+          </Link>
           <ClientForm />
 
           <div className="text-14-regular mt-6 flex justify-between ">
