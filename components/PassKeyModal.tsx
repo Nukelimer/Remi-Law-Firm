@@ -20,30 +20,51 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
-import { useState } from "react";
-import { encryptKey } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { decryptKey, encryptKey } from "@/lib/utils";
 
 function PassKeyModal() {
   const router = useRouter();
   const [open, setOpen] = useState(true);
   const [passkey, setPasskey] = useState("");
   const [error, setError] = useState("");
-//   console.log({ passkey });
+  const path = usePathname();
+  //   console.log({ passkey });
+  const getEncriptedKey =
+    typeof window == "undefined"
+      ? null
+      : window.localStorage.getItem("accessKey");
 
-    const validateHander = (e:React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        e.preventDefault() 
-        
-        if (passkey === process.env.NEXT_PUBLIC_ADMIN_PASSKEY) {
-            const encriptedKey = encryptKey(passkey);
-            console.log({ encriptedKey });
-            localStorage.setItem('accessKey', encriptedKey)
-            
-        } else {
-            setError('Invalid PassKey!')
-        }
+  // console.log({ getEncriptedKey });
+
+  useEffect(() => {
+    const accessKey = getEncriptedKey && decryptKey(getEncriptedKey);
+    if (path) {
+      if (accessKey === process.env.NEXT_PUBLIC_ADMIN_PASSKEY) {
+        setOpen(false);
+        router.push("/admin");
+      } else {
+        setOpen(true);
+      }
     }
+  }, [getEncriptedKey]);
+
+  const validateHander = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+
+    if (passkey === process.env.NEXT_PUBLIC_ADMIN_PASSKEY) {
+      const encriptedKey = encryptKey(passkey);
+      console.log({ encriptedKey });
+      localStorage.setItem("accessKey", encriptedKey);
+      setOpen(false);
+    } else {
+      setError("Invalid PassKey!");
+    }
+  };
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       {/* <AlertDialogTrigger>Open</AlertDialogTrigger> */}
@@ -95,7 +116,11 @@ function PassKeyModal() {
         </AlertDialogHeader>
         <AlertDialogFooter>
           {/* <AlertDialogCancel>Cancel</AlertDialogCancel> */}
-                  <AlertDialogAction className="border bg-green-500" onClick={(e) => validateHander(e)}>Verify Pass Key</AlertDialogAction>
+          <AlertDialogAction
+            className="border bg-green-500"
+            onClick={(e) => validateHander(e)}>
+            Verify Pass Key
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
