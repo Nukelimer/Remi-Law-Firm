@@ -1,4 +1,4 @@
-import {columns, Payment} from "@/components/forms/table/Column";
+import {columns} from "@/components/forms/table/Column";
 import { DataTable } from "@/components/forms/table/DataTable";
 // import DataTable from "@/components/forms/table/DataTable";
 import StatCard from "@/components/StatCard";

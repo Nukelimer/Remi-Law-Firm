@@ -1,5 +1,7 @@
 /* eslint-disable no-unused-vars */
 
+import { Client } from "./appwrite.types";
+
 declare type SearchParamProps = {
   params: { [key: string]: string };
   searchParams: { [key: string]: string | string[] | undefined };
@@ -37,7 +39,7 @@ declare interface RegisterUserParams extends CreateUserParams {
 
 declare type CreateAppointmentParams = {
   userId: string;
-  CLIENT_COLLECTION_ID: string;
+  s_client_collection_id: string;
   primary_counsel_or_lawyer: string;
   reason: string;
   schedule: Date;

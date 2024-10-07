@@ -14,6 +14,7 @@ import {
 } from "../appwrite.config";
 import { parseStringify } from "../utils";
 import { InputFile } from "node-appwrite/file";
+import { CreateUserParams, RegisterUserParams } from "@/types";
 export const createUser = async (user: CreateUserParams) => {
   try {
     const newuser = await users.create(
@@ -35,7 +36,6 @@ export const createUser = async (user: CreateUserParams) => {
     }
 
     console.error("An error occurred while creating a new user:", error);
-    
   }
 };
 
@@ -50,7 +50,7 @@ export const getUser = async (userId: string) => {
 
 export const registerUser = async ({
   identification_document,
-  ...Client
+  ...client
 }: RegisterUserParams) => {
   try {
     let file;
@@ -77,7 +77,7 @@ export const registerUser = async ({
       {
         identificationDocumentId: file?.$id ? file.$id : null,
         identification_document_link: `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file?.$id}/view?project=${PROJECT_ID}`,
-        ...Client,
+        ...client,
       }
     );
     return parseStringify(newClient);
@@ -88,12 +88,12 @@ export const registerUser = async ({
 
 export const getClient = async (userId: string) => {
   try {
-    const client = await databases.listDocuments(
+    const clients = await databases.listDocuments(
       DATABASE_ID!,
       CLIENT_COLLECTION_ID!,
       [Query.equal("userId", userId)]
     );
-    return parseStringify(client.documents[0]);
+    return parseStringify(clients.documents[0]);
   } catch (error) {
     console.log(error);
   }

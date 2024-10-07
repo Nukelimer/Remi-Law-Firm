@@ -9,6 +9,8 @@ import {
 import { parseStringify } from "../utils";
 import { scheduler } from "timers/promises";
 import { Appointment } from "@/types/appwrite.types";
+import { revalidatePath } from "next/cache";
+import { CreateAppointmentParams, UpdateAppointmentParams } from "@/types";
 
 export const createAppointment = async (
   appointment: CreateAppointmentParams
@@ -19,8 +21,10 @@ export const createAppointment = async (
       DATABASE_ID!,
       APPOINTMENT_COLLECTION_ID!,
       ID.unique(),
-      JSON.stringify(appointment)
+      appointment
     );
+    console.log({ newAppointment });
+
     return parseStringify(newAppointment);
   } catch (error) {
     console.log("An error occurred while creating a new appointment:", error);
@@ -85,5 +89,29 @@ export const getRecentAppointmentList = async () => {
       "An error occurred while retrieving the list of existing client:",
       error
     );
+  }
+};
+
+export const updateAppointment = async ({
+  appointmentId,
+  userId,
+  appointment,
+  type,
+}: UpdateAppointmentParams) => {
+  try {
+    const updatedAppointment = await databases.updateDocument(
+      DATABASE_ID!,
+      APPOINTMENT_COLLECTION_ID!,
+      appointmentId,
+      appointment
+    );
+    if (!updatedAppointment) {
+      throw new Error("Appointment not found!");
+    }
+
+    revalidatePath("/admin");
+    return parseStringify(updatedAppointment);
+  } catch (error) {
+    console.log(error);
   }
 };

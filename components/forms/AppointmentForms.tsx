@@ -14,16 +14,25 @@ import { FormFieldType } from "./ClientForms";
 import Image from "next/image";
 import { SelectItem } from "../ui/select";
 import { Lawyers } from "@/constants";
-import { createAppointment } from "@/lib/actions/appointment.actions";
+import {
+  createAppointment,
+  updateAppointment,
+} from "@/lib/actions/appointment.actions";
+import { Appointment } from "@/types/appwrite.types";
+import { Status } from "@/types";
 
 function AppointmentForms({
   userId,
   clientId,
   type,
+  appointment,
+  setOpen,
 }: {
   userId: string;
   clientId: string;
   type: "cancel" | "create" | "schedule";
+  appointment?: Appointment;
+  setOpen: (open: boolean) => void;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
@@ -32,11 +41,13 @@ function AppointmentForms({
   const form = useForm<z.infer<typeof AppointmentFormValidation>>({
     resolver: zodResolver(AppointmentFormValidation),
     defaultValues: {
-      primary_counsel_or_lawyer: "",
-      reason: "",
-      note: "",
-      cancellation_reason: "",
-      schedule: new Date(),
+      primary_counsel_or_lawyer: appointment
+        ? appointment.primary_counsel_or_lawyer
+        : "",
+      reason: (appointment && appointment.reason) || "",
+      note: appointment ? appointment.note : "",
+      cancellation_reason:  appointment?.cancellation_reason || " ",
+      schedule: appointment ? new Date(appointment.schedule) : new Date(),
     },
   });
 
@@ -62,8 +73,8 @@ function AppointmentForms({
   }
   async function onSubmit(values: z.infer<typeof AppointmentFormValidation>) {
     setIsLoading(true);
-    // const userData = { name, email, phone };
-    console.log({ newApp: values });
+
+    console.log({ type, clientId });
 
     let status;
     switch (type) {
@@ -86,19 +97,40 @@ function AppointmentForms({
         // router.push(`/clients/${user.$id}/register`);
         const appointmentData = {
           userId,
-          CLIENT_COLLECTION_ID: clientId,
+          s_client_collection_id: clientId,
           primary_counsel_or_lawyer: values.primary_counsel_or_lawyer,
           schedule: new Date(values.schedule),
           reason: values.reason!,
           note: values.note,
           status: status as Status,
         };
+
         const appointment = await createAppointment(appointmentData);
+
         if (appointment) {
           form.reset();
           router.push(
             `/clients/${userId}/new-appointment/success?appointment=${appointment.$id}`
           );
+        }
+      } else {
+        const appointmentToUpdate = {
+          userId,
+          appointmentId: appointment?.$id!,
+          appointment: {
+            primary_counsel_or_lawyer: values.primary_counsel_or_lawyer,
+            schedule: new Date(values.schedule),
+            status: status as Status,
+            cancellation_reason: values.cancellation_reason,
+          },
+          type,
+        };
+
+        const updatedAppointment = await updateAppointment(appointmentToUpdate);
+
+        if (updatedAppointment) {
+          setOpen && setOpen(false);
+          form.reset();
         }
       }
     } catch (error) {
@@ -111,13 +143,15 @@ function AppointmentForms({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 flex-1">
-        <section className="mb-12 space-y-4">
-          <h1 className="header !text-2xl">New Appointment</h1>
-          <p className="text-dark-700">
-            Book your appointment with your favourite lawyers in less than 10
-            seconds!
-          </p>
-        </section>
+        {type != "create" ? undefined : (
+          <section className="mb-12 space-y-4">
+            <h1 className="header !text-2xl">New Appointment</h1>
+            <p className="text-dark-700">
+              Book your appointment with your favourite lawyers in less than 10
+              seconds!
+            </p>
+          </section>
+        )}
         {type !== "cancel" && (
           <>
             {/* <FormControl>
@@ -192,7 +226,7 @@ function AppointmentForms({
           <RLLP_Forms
             control={form.control}
             name="cancellation_reason"
-            placeholder="EEnter your reason(s) for cancelling this appointment."
+            placeholder="Enter your reason(s) for cancelling this appointment."
             label="Reason for Cancelling."
             fieldType={FormFieldType.TEXTAREA}
           />

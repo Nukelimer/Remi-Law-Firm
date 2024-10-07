@@ -2,100 +2,109 @@
 import { MoreHorizontal } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import StatusBadge from "@/components/StatusBadge";
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-export type Payment = {
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
-};
 
-export const columns: ColumnDef<Payment>[] = [
+import StatusBadge from "@/components/StatusBadge";
+import { formatDateTime } from "@/lib/utils";
+import Image from "next/image";
+import { Lawyers } from "@/constants";
+import AppointmentModal from "@/components/AppointmentModal";
+import { Appointment } from "@/types/appwrite.types";
+
+export const columns: ColumnDef<Appointment>[] = [
   {
     header: "ID",
-    cell: ({ row }) => <p className="text-14-medium">{row.index + 1}</p>,
+    cell: ({ row }) => {
+      console.log(row.original);
+
+      <p className="text-14-medium">{row.index + 1}</p>;
+    },
   },
 
   {
-    accessorKey: "CLIENT_COLLECTION_ID",
+    accessorKey: "data",
     header: "Client",
     cell: ({ row }) => {
-      const clientRow = row.original;
+      const clientRow = row.original.client_collection;
+
+      console.log({ clientRow });
 
       return (
-        <p className="text-14-medium">
-          {clientRow.CLIENT_COLLECTION_ID.name}
-        </p>
+        // <p className="text-14-medium">{clientRow.client_collection.name}</p>
+
+        ''
       );
     },
   },
 
   {
     accessorKey: "status",
-      header: "Status",
-      cell: ({ row }) => {
-          const statusRow = row.original;
-
-
-          return <div className="min-w-[115px]">
-              
-              <StatusBadge status={ statusRow.status} />
-
-          </div>
-      }
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
-  },
-  {
-    accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
+    header: "Status",
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
+      const statusRow = row.original;
 
-      return <div className="text-right font-medium">{formatted}</div>;
+      return (
+        <div className="min-w-[115px]">
+          <StatusBadge status={statusRow.status} />
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "schedule",
+    header: "Appointment",
+    cell: ({ row }) => {
+      const scheduleRow = row.original;
+      return (
+        <p className="text-14-regular min-w-[100px]">
+          {formatDateTime(scheduleRow.schedule).dateTime}
+        </p>
+      );
+    },
+  },
+  {
+    accessorKey: "primary_counsel_or_lawyer",
+    header: () => <div className="text-center">Lawyer</div>,
+    cell: ({ row }) => {
+      const lawyerRow = row.original.primary_counsel_or_lawyer;
+      const lawyer = Lawyers.find(
+        (singleLawyer) => singleLawyer.name === lawyerRow
+      );
+      return (
+        <div className="flex items-center       gap-3     text-right font-medium">
+          <Image
+            className="rounded-full size-10"
+            src={lawyer?.image}
+            alt={lawyer?.name || "lawyer"}
+            width={100}
+            height={100}
+          />
+          <p className="whitespace-nowrap">{lawyer?.name} Esq</p>
+        </div>
+      );
     },
   },
   {
     id: "actions",
+    header: () => <div className="pl-4">Actions</div>,
     cell: ({ row }) => {
-      const payment = row.original;
-
+      const data = row.original;
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}>
-              Copy payment ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className=" gap-1 hidden">
+          <AppointmentModal
+            type="schedule"
+            clientId={data.client_collection.$id}
+            userId={data.userId}
+            appointment={data}
+          />
+          <AppointmentModal
+            type="cancel"
+            clientId={data.client_collection.$id}
+            userId={data.userId}
+            appointment={data}
+          />
+        </div>
       );
     },
   },
 ];
+

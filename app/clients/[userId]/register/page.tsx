@@ -5,10 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import RLLP_Image from "../_components/RLLP_Image";
+import { redirect } from "next/navigation";
 
 async function Register({ params: { userId } }: SearchParamProps) {
   const user = await getUser(userId);
-
+  if (user) redirect(`/patients/${userId}/new-appointment`);
   return (
     <div className="flex h-screen w-full">
       <div className="text-white flex h-full w-full flex-row">
