@@ -31,7 +31,7 @@ export const columns: ColumnDef<Appointment>[] = [
       return (
         // <p className="text-14-medium">{clientRow.client_collection.name}</p>
 
-        ''
+        ""
       );
     },
   },
@@ -107,4 +107,3 @@ export const columns: ColumnDef<Appointment>[] = [
     },
   },
 ];
-
